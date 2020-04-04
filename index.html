@@ -11,35 +11,109 @@
 </head>
 
 <body>
-    <header id="wxHeader">
-        <h1>Weather Dashboard</h1>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Weather Dashboard</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
+                aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Need to manipulate these based on recent searches -->
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link">About</a>
+                    </li>
+                </ul>
+                <form class="form-inline">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
     </header>
     <div class="container">
         <div class="row">
-            <div id="sideBar" class="col-4">
+            <!-- OLD NAV-->
+            <!-- <div id="sideBar" class="col-md-4 col-sm-12">
                 <input type="search" class="form-control ds-input" id="search-input" placeholder="Search for city">
                 <ul id="cityBtnList" class="list-group">
-                    <li class="btn list-group-item">Cras justo odio</li>
-                    <li class="btn list-group-item">Dapibus ac facilisis in</li>
-                    <li class="btn list-group-item">Morbi leo risus</li>
-                    <li class="btn list-group-item">Porta ac consectetur ac</li>
-                    <li class="btn list-group-item">Vestibulum at eros</li>
+                    <li class="btn list-group-item">Search a city to add to recents</li>
+                    <li class="btn list-group-item">Search a city to add to recents</li>
+                    <li class="btn list-group-item">Search a city to add to recents</li>
+                    <li class="btn list-group-item">Search a city to add to recents</li>
+                    <li class="btn list-group-item">Search a city to add to recents</li>
                 </ul>
-            </div>
-            <div class="col-8">
-                <div class="card">
-                    <div class="card-header">
-                        Featured
-                    </div>
+            </div> -->
+            <!-- END OLD NAV-->
+            <div class="col-sm-12">
+                <!-- Target #activeCityCard to update each element with wxData-->
+                <div id="activeCityCard" class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-
+                        <h5 id="cityName" class="card-title">What weather?</h5>
+                        <p id="sit">You haven't given me a city to display.</p>
+                        <p id="cityTemp">Once you do, I'll display the temperature</p>
+                        <p id="cityHum">...the humidity</p>
+                        <p id="cityWs">...the wind speed</p>
+                        <p id="cityUv">...and the UV index.</p>
                     </div>
                 </div>
             </div>
+            <!-- <div id="fiveDay" class="col" -->
+            <div class="fiveDay">
+                <div class="dayCard">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Date</h5>
+                        <p class="card-text">Temp</p>
+                        <p class="card-text">Hum</p>
+                    </div>
+                </div>
+                <div class="dayCard">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Date</h5>
+                        <p class="card-text">Temp</p>
+                        <p class="card-text">Hum</p>
+                    </div>
+                </div>
+                <div class="dayCard">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Date</h5>
+                        <p class="card-text">Temp</p>
+                        <p class="card-text">Hum</p>
+                    </div>
+                </div>
+                <div class="dayCard">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Date</h5>
+                        <p class="card-text">Temp</p>
+                        <p class="card-text">Hum</p>
+                    </div>
+                </div>
+                <div class="dayCard">
+                    <div class="card-header">Header</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Date</h5>
+                        <p class="card-text">Temp</p>
+                        <p class="card-text">Hum</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        <div class="row"></div>
+    </div>
 
     </div>
 
@@ -59,13 +133,3 @@
 </body>
 
 </html>
-
-<!-- To do list 
-- Create/link html css js sheets
-
-
-
-
-
-
--->
