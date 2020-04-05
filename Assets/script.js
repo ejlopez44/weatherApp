@@ -3,13 +3,16 @@
 $().ready(function () {
     console.log("ready!");
 
+    //LETS START WITH THE DATE
+    var today = (moment().format(' [(]M[/]D[/]YYYY[)]'))
+
     //GLOBAL VARIABLES
     var navList = $('#recentCities')
     var fiveDay = $('fiveDay')
     var userLocation = "";
     //API VARIABLES
     var wxKey = "&appid=d4e0d5067632cdd06a4bad12b5b1e650";
-    var wxApi = "https://cors-anywhere.herokuapp.com/api.openweathermap.org/data/2.5/"
+    var wxApi = "https://api.openweathermap.org/data/2.5/"
     var wxDaily = "forecast?"
     var wxUvI = "uvi?"
     var wxCurr = "weather?"
@@ -86,8 +89,24 @@ $().ready(function () {
             })
                 .then(function (response) {
                     activeLocation.uvindex = response.value
+                    let uvIndex = activeLocation.uvindex
                     console.log(activeLocation)
-                    $('#cityUv').text("UV Index: " + activeLocation.uvindex.toFixed(1))
+                    $('#cityUv').text("UV Index: " + uvIndex.toFixed(1))
+                    if (uvIndex < 3) {
+                        $('#cityUv').addClass('uvIndex uvLow')
+                    }
+                    if (uvIndex >= 3 && uvIndex < 5) {
+                        $('#cityUv').addClass('uvIndex uvMod')
+                    }
+                    if (uvIndex >= 5 && uvIndex < 7) {
+                        $('#cityUv').addClass('uvIndex uvHigh')
+                    }
+                    if (uvIndex >= 7 && uvIndex < 10) {
+                        $('#cityUv').addClass('uvIndex uvVhigh')
+                    }
+                    if (uvIndex >= 10) {
+                        $('#cityUv').addClass('uvIndex uvXtreme')
+                    }
                 }) // end of then function
         } // end of UV INDEX ajax call
 
@@ -155,7 +174,7 @@ $().ready(function () {
 
     function renderCurrWx() {
         //TARGET #activeCityCard ELEMENTS AND UPDATE EACH ELEMENT WITH KEY VALUES
-        $('#cityName').text(activeLocation.name + ", " + activeLocation.country)
+        $('#cityName').text(activeLocation.name + ", " + activeLocation.country + today)
         $('#wxCond').attr('src', "http://openweathermap.org/img/wn/" + activeLocation.wxIcon + "@2x.png").prop('alt', activeLocation.wxCond)
         $('#cityTemp').text("Temperature: " + activeLocation.temp.toFixed(0) + " \xB0F")
         $('#cityHum').text("Humidity: " + activeLocation.humidity)
@@ -216,10 +235,16 @@ $().ready(function () {
     } // end of updateRecents cities function
 
     function addNavItem(param) {
-        let newNavItem = $('<li>').addClass('nav-item')
+        let newNavItem = $('<li>').addClass('nav-item').attr('data-name', 'q=' + param)
+        newNavItem.on('click', callWxBtn)
         let cityName = $('<a>').addClass('nav-link').attr('href', '#').text(param).appendTo(newNavItem)
         //NEEDS ONCLICK EVENT TO CALL callWxData FUNCTION, WITH VALUE ATTR
         newNavItem.prependTo(navList)
+    }
+    //onclick function
+    function callWxBtn() {
+        let btnValue = ($(this).data('name'))
+        callWxData(btnValue)
     }
 
     // ----------- END OF SEARCH FUNCTIONALITY / NAV ITEM ADDITION

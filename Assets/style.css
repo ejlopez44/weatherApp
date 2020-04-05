@@ -33,3 +33,36 @@
     border-radius: .25rem;
 }
 
+/* Styling for UV Index */
+.uvIndex {
+    vertical-align: middle;
+    border: 1px solid transparent;
+    padding: .375rem .75rem;
+    font-weight: bold;
+}
+
+.uvLow {
+    color: #fff;
+    background-color: #3EA72D;
+    border-color: #28a745;
+}
+.uvMod {
+    color: #000000;
+    background-color: #fff300;
+    border-color: #fff300;
+}
+.uvHigh {
+    color: #000000;
+    background-color: #f18b00;
+    border-color: #f18b00;
+}
+.uvVhigh {
+    color: #fff;
+    background-color: #E53210;
+    border-color: #E53210;;
+}
+.uvXtreme {
+    color: #fff;
+    background-color: rgb(181, 103, 164);
+    border-color: rgb(181, 103, 164);
+}
