@@ -4,6 +4,7 @@ $().ready(function () {
     console.log("ready!");
 
     //GLOBAL VARIABLES
+    var navList = $('#recentCities')
     var userLocation = "";
     var wxKey = "&appid=d4e0d5067632cdd06a4bad12b5b1e650";
     var wxApi = "api.openweathermap.org/data/2.5/"
@@ -67,15 +68,45 @@ $().ready(function () {
 
     } // end of callcurrentWx ajax call
 
-    $('#city-searchBtn').on('click', function (e) {
+    $('#city-searchBtn').on('click', updateRecents)
+
+
+    function updateRecents(e) {
         e.preventDefault();
         // take input of previous element and console log
         var searchCriteria = $(this).prev().val()
         // COOL NOW I HAVE A LOCATION TO DEFINE GLOBALLY SOMEPLACE.. PUSH TO AN ARRAY?
         console.log(searchCriteria)
+        //this clears the input box after submitting
+        $(this).prev().val('')
 
-    }) // end of onclick function
+        //Push Search Criteria to recents array as long as the array is maximum 6 entries, otherwise remove the earliest
+        if (recentSearches.length <= 2) {
+            recentSearches.unshift(searchCriteria)
+            addNavItem(searchCriteria)
+        }
+        else {
+            //REMOVE OLDEST ARRAY ITEM
+            recentSearches.pop()
+            //DELETE THE LAST ELEMENT FROM NAVLIST
+            navList.children().last().remove()
+            //ADD THE NEW ARRAY ITEM TO FRONT OF ARRAY
+            recentSearches.unshift(searchCriteria)
+            //APPEND THE NEW ARRAY ITEM TO THE TOP OF THE NAV LIST
+            addNavItem(searchCriteria)
+
+        }
+
+        console.log(recentSearches)
 
 
+    } // end of updateRecents cities function
+
+    function addNavItem(searchCriteria) {
+        let newNavItem = $('<li>').addClass('nav-item')
+        let cityName = $('<a>').addClass('nav-link').attr('href', '#').text(searchCriteria).appendTo(newNavItem)
+        //NEEDS ONCLICK EVENT TO CALL callWxData FUNCTION, WITH VALUE ATTR
+        newNavItem.prependTo(navList)
+    }
 
 }) // end of ready function
