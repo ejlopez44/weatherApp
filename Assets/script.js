@@ -5,18 +5,25 @@ $().ready(function () {
 
     //GLOBAL VARIABLES
     var navList = $('#recentCities')
+    var fiveDay = $('fiveDay')
     var userLocation = "";
+    //API VARIABLES
     var wxKey = "&appid=d4e0d5067632cdd06a4bad12b5b1e650";
-    var wxApi = "api.openweathermap.org/data/2.5/"
+    var wxApi = "https://cors-anywhere.herokuapp.com/api.openweathermap.org/data/2.5/"
+    var wxDaily = "forecast?"
+    var wxUvI = "uvi?"
+    var wxCurr = "weather?"
+    var imperials = "&units=imperial"
     // DYNAMIC OBJECT OF CURRENTLY SELECTED WEATHER LOCATION VARIABLES
     var recentSearches = []
-    var currentWx = {
+    var activeLocation = {
         name: "", // response.name
+        country: "", // response.sys.country
         temp: "", // response.main.temp
         humidity: "", // response.main.humidity
         wind: "", // response.wind.speed
-        wxCond: "",// response.weather.description
-        wxIcon: "", // response.weather.icon Gets the weather image icon class
+        wxCond: "",// response.weather[0].description
+        wxIcon: "", // response.weather[0].icon Gets the weather image icon class
         uvindex: "", // NEED TO FIND EXAMPLE API CALL
         forecast: [{
             date: "", // response.
@@ -26,6 +33,66 @@ $().ready(function () {
             wxCond: "",// response.
         }]
     }
+
+    //--------- BEGIN API CALLS ---------
+    //NEED TO MAKE A FUNCTION TO MAKE 3 API CALLS AND CREATE RESPONSE VARIABLES
+    function callWxData(param) {
+        callCurrApi(param)
+        function callCurrApi(param) {
+            queryURL = wxApi + wxCurr + param + imperials + wxKey
+            console.log(queryURL)
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            })
+                .then(function (response) {
+                    // NEED TO PASS LON,LAT STRING VALUE TO UV CALL
+                    let lat = response.coord.lat;
+                    let lon = response.coord.lon;
+                    let coords = "lat=" + lat + "&lon=" + lon
+                    console.log("Coordinate Check" + coords)
+                    callUvApi(coords)
+                    activeLocation.name = response.name
+                    activeLocation.country = response.sys.country
+                    activeLocation.temp = response.main.temp
+                    activeLocation.humidity = response.main.humidity
+                    activeLocation.wind = response.wind.speed
+                    activeLocation.wxCond = response.weather[0].description
+                    activeLocation.wxIcon = response.weather[0].icon
+                    renderCurrWx()
+                    callDailyApi(param)
+                }) // end of then function
+        } // end of CURRENT WX ajax call
+
+        function callDailyApi(param) {
+            queryURL = wxApi + wxDaily + param + imperials + wxKey
+            console.log(queryURL)
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            })
+                .then(function (response) {
+                    console.log(response)
+                    // renderFcast()
+                }) // end of then function
+        } // end of 5 DAY 4CAST ajax call
+
+        function callUvApi(param) {
+            queryURL = wxApi + wxUvI + param + wxKey
+            console.log(queryURL)
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            })
+                .then(function (response) {
+                    activeLocation.uvindex = response.value
+                    console.log(activeLocation)
+                    $('#cityUv').text("UV Index: " + activeLocation.uvindex.toFixed(1))
+                }) // end of then function
+        } // end of UV INDEX ajax call
+
+    }
+    //--------- END OF API CALLS ---------
 
     //--------- BEGIN LOCAL STORAGE FUNCTIONS ---------
     getLocal()
@@ -55,7 +122,8 @@ $().ready(function () {
     //--------- END LOCAL STORAGE ---------
 
 
-    // FUNCTION DEFINES GEOLOCATION COORDINATES OF USER
+
+    // BEGIN GEOLOCATION COORDINATES OF USER
     function getLocation() {
         // Make sure browser supports this feature
         if (navigator.geolocation) {
@@ -70,8 +138,8 @@ $().ready(function () {
     // This will get called after getCurrentPosition()
     function showPosition(position) {
         // Grab coordinates from the given object
-        var lat = "lat=" + position.coords.latitude;
-        var lon = "lon=" + position.coords.longitude;
+        var lat = "lat=" + position.coords.latitude.toFixed(2);
+        var lon = "lon=" + position.coords.longitude.toFixed(2);
         userLocation = lat + "&" + lon
         console.log(userLocation);
         // for now this simply shows me the string to make an ajax call
@@ -79,22 +147,39 @@ $().ready(function () {
         console.log(localWxRqst);
 
         // Call next function to get wx data NEEDS TO BE TURNED OFF FOR NOW
-        // callWxData(localWxRqst);
+        callWxData(userLocation);
+
     }
     getLocation();
-    // END OF GET GEOLOCATION FUNCTION
+    //--------- END OF GEOLOCATION COORDINATES OF USER ---------
 
-    function callWxData(queryURL) {
-        $.ajax({
-            url: queryURL,
-            method: "GET"
-        })
-            .then(function (reponse) {
+    function renderCurrWx() {
+        //TARGET #activeCityCard ELEMENTS AND UPDATE EACH ELEMENT WITH KEY VALUES
+        $('#cityName').text(activeLocation.name + ", " + activeLocation.country)
+        $('#wxCond').attr('src', "http://openweathermap.org/img/wn/" + activeLocation.wxIcon + "@2x.png").prop('alt', activeLocation.wxCond)
+        $('#cityTemp').text("Temperature: " + activeLocation.temp.toFixed(0) + " \xB0F")
+        $('#cityHum').text("Humidity: " + activeLocation.humidity)
+        $('#cityWs').text("Wind Speed: " + activeLocation.wind + " MPH")
+    }
+    function renderFcast() {
+        // TARGET FIVE DAY CONTAINER AND CREATE ELEMENTS FOR EACH DAY OF OBJECT ARRAY
+        for (let i = 0; i < activeLocation.forecast.length; i++) {
+            let dayCard = $('<div>').addClass('day-card').text()
+            dayCard.appendTo(fiveDay)
+            let futureDate = $('<div>').addClass('card-header').text()
+            futureDate.appendTo(dayCard)
+            let wxDeets = $('<div>').addClass('card-body').text()
+            wxDeets.appendTo(dayCard)
+            let futureIcon = $('<h5>').addClass('card-title').text()
+            futureIcon.appendTo(wxDeets)
+            let futureTemp = $('<p>').addClass('card-text').text()
+            futureTemp.appendTo(wxDeets)
+            let futureHum = $('<p>').addClass('card-text').text()
+            futureHum.appendTo(wxDeets)
+        }
 
-            }) // end of then function
+    }
 
-
-    } // end of callcurrentWx ajax call
 
 
     // ----------- SEARCH FUNCTIONALITY / NAV ITEM ADDITION
@@ -108,8 +193,8 @@ $().ready(function () {
         //this clears the input box after submitting
         $(this).prev().val('')
 
-        //Push Search Criteria to recents array as long as the array is maximum 6 entries, otherwise remove the earliest
-        if (recentSearches.length < 4) {
+        //Push Search Criteria to recents array as long as the array is maximum 5 entries, otherwise remove the earliest
+        if (recentSearches.length < 10) {
             recentSearches.unshift(searchCriteria)
             addNavItem(searchCriteria)
             saveRecents()
@@ -124,8 +209,10 @@ $().ready(function () {
             //APPEND THE NEW ARRAY ITEM TO THE TOP OF THE NAV LIST
             addNavItem(searchCriteria)
             saveRecents()
-
         }
+        //CALL API WITH searchCriteria
+        let urlParam = "q=" + searchCriteria
+        callWxData(urlParam)
     } // end of updateRecents cities function
 
     function addNavItem(param) {
@@ -133,7 +220,6 @@ $().ready(function () {
         let cityName = $('<a>').addClass('nav-link').attr('href', '#').text(param).appendTo(newNavItem)
         //NEEDS ONCLICK EVENT TO CALL callWxData FUNCTION, WITH VALUE ATTR
         newNavItem.prependTo(navList)
-        console.log(newNavItem)
     }
 
     // ----------- END OF SEARCH FUNCTIONALITY / NAV ITEM ADDITION
