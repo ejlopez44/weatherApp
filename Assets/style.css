@@ -8,7 +8,7 @@
     width: 100%;
 }
 
-.fiveDay {
+#fiveDay {
     display: flex;
     align-items: flex-start;
     /* justify-content: center; */
