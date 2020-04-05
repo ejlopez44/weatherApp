@@ -27,6 +27,34 @@ $().ready(function () {
         }]
     }
 
+    //--------- BEGIN LOCAL STORAGE FUNCTIONS ---------
+    getLocal()
+    function getLocal() {
+        //Parse the local storage data for my specific 'Events' key and assign it a variable of stored
+        var storedRecents = JSON.parse(localStorage.getItem('Recent Cities'))
+        //if stored is null (doesn't exist) function ends and doesn't update calEvents array with the correct data.
+        console.log(storedRecents)
+        if (storedRecents !== null) {
+            recentSearches = storedRecents;
+            generateNav()
+        }
+    }// end of Get Local
+
+    // THIS save FUNCTION IS WORKING AND SAVES VALUES ADDED TO THE INPUT BOX TO THE LOCAL STORAGE
+    function saveRecents() {
+        // // saves entire Object to local storage
+        localStorage.setItem('Recent Cities', JSON.stringify(recentSearches));
+    }
+
+    function generateNav() {
+        //NEEDED TO REVERSE THIS LOOP TO CREATE THE ELEMENTS IN THE SAME ORDER AS SEARCHED
+        for (let i = recentSearches.length - 1; i >= 0; i--) {
+            addNavItem(recentSearches[i])
+        }
+    }
+    //--------- END LOCAL STORAGE ---------
+
+
     // FUNCTION DEFINES GEOLOCATION COORDINATES OF USER
     function getLocation() {
         // Make sure browser supports this feature
@@ -68,22 +96,23 @@ $().ready(function () {
 
     } // end of callcurrentWx ajax call
 
+
+    // ----------- SEARCH FUNCTIONALITY / NAV ITEM ADDITION
     $('#city-searchBtn').on('click', updateRecents)
-
-
     function updateRecents(e) {
         e.preventDefault();
         // take input of previous element and console log
         var searchCriteria = $(this).prev().val()
-        // COOL NOW I HAVE A LOCATION TO DEFINE GLOBALLY SOMEPLACE.. PUSH TO AN ARRAY?
+        // COOL NOW I HAVE A STRING TO DEFINE GLOBALLY SOMEPLACE.. PUSH TO AN ARRAY?
         console.log(searchCriteria)
         //this clears the input box after submitting
         $(this).prev().val('')
 
         //Push Search Criteria to recents array as long as the array is maximum 6 entries, otherwise remove the earliest
-        if (recentSearches.length <= 2) {
+        if (recentSearches.length < 4) {
             recentSearches.unshift(searchCriteria)
             addNavItem(searchCriteria)
+            saveRecents()
         }
         else {
             //REMOVE OLDEST ARRAY ITEM
@@ -94,19 +123,19 @@ $().ready(function () {
             recentSearches.unshift(searchCriteria)
             //APPEND THE NEW ARRAY ITEM TO THE TOP OF THE NAV LIST
             addNavItem(searchCriteria)
+            saveRecents()
 
         }
-
-        console.log(recentSearches)
-
-
     } // end of updateRecents cities function
 
-    function addNavItem(searchCriteria) {
+    function addNavItem(param) {
         let newNavItem = $('<li>').addClass('nav-item')
-        let cityName = $('<a>').addClass('nav-link').attr('href', '#').text(searchCriteria).appendTo(newNavItem)
+        let cityName = $('<a>').addClass('nav-link').attr('href', '#').text(param).appendTo(newNavItem)
         //NEEDS ONCLICK EVENT TO CALL callWxData FUNCTION, WITH VALUE ATTR
         newNavItem.prependTo(navList)
+        console.log(newNavItem)
     }
+
+    // ----------- END OF SEARCH FUNCTIONALITY / NAV ITEM ADDITION
 
 }) // end of ready function
