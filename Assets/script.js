@@ -3,8 +3,14 @@
 $().ready(function () {
     console.log("ready!");
 
-    //LETS START WITH THE DATE
+    //LETS START WITH THE DATE AND FIVE DAY VARIABLES
     var today = (moment().format(' [(]M[/]D[/]YYYY[)]'))
+    var date = (moment().format('YYYY[-]MM[-]DD'))
+    console.log(date)
+    //TESTS FOR DATE VARIABLES
+    // var tomorrow = 0;
+    // var theNextDay = (moment().add(2, 'days').format('YYYY[-]MM[-]DD'))
+    // console.log(theNextDay)
 
     //GLOBAL VARIABLES
     var navList = $('#recentCities')
@@ -29,11 +35,14 @@ $().ready(function () {
         wxIcon: "", // response.weather[0].icon Gets the weather image icon class
         uvindex: "", // NEED TO FIND EXAMPLE API CALL
         forecast: [{
-            date: "", // response.
-            temp: "", // response.
-            humidity: "", // response.
-            wxIcon: "", // response.
-            wxCond: "",// response.
+
+            //template keys needed
+            // date: "", // response.
+            // time: "", 
+            // temp: "", // response.
+            // humidity: "", // response.
+            // wxIcon: "", // response.
+            // wxCond: "",// response.
         }]
     }
 
@@ -76,7 +85,10 @@ $().ready(function () {
             })
                 .then(function (response) {
                     console.log(response)
-                    // renderFcast()
+                    // call a function that makes an object and key value in the array for each match of 15:00 within activeLocation.forecast[i]
+
+
+                    // renderFcast() to create elements
                 }) // end of then function
         } // end of 5 DAY 4CAST ajax call
 
@@ -177,7 +189,7 @@ $().ready(function () {
         $('#cityName').text(activeLocation.name + ", " + activeLocation.country + today)
         $('#wxCond').attr('src', "http://openweathermap.org/img/wn/" + activeLocation.wxIcon + "@2x.png").prop('alt', activeLocation.wxCond)
         $('#cityTemp').text("Temperature: " + activeLocation.temp.toFixed(0) + " \xB0F")
-        $('#cityHum').text("Humidity: " + activeLocation.humidity)
+        $('#cityHum').text("Humidity: " + activeLocation.humidity + "%")
         $('#cityWs').text("Wind Speed: " + activeLocation.wind + " MPH")
     }
     function renderFcast() {
@@ -241,7 +253,7 @@ $().ready(function () {
         //NEEDS ONCLICK EVENT TO CALL callWxData FUNCTION, WITH VALUE ATTR
         newNavItem.prependTo(navList)
     }
-    //onclick function
+    // FUNCTION TIED TO NAV LINK CLICKS TO TAKE THEIR DATA NAME AND SEND TO API CALL
     function callWxBtn() {
         let btnValue = ($(this).data('name'))
         callWxData(btnValue)
