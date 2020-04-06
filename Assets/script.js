@@ -5,21 +5,31 @@ $().ready(function () {
 
     //LETS START WITH THE DATE AND FIVE DAY VARIABLES
     var today = (moment().format(' [(]M[/]D[/]YYYY[)]'))
-    var date = (moment().format('YYYY[-]MM[-]DD'))
-    console.log(date)
+    //must be a smarter way to iterate this...
+    var nextFive = [{
+        day: (moment().add(1, 'days').format('M[/]D[/]YYYY')),
+    }, {
+        day: (moment().add(2, 'days').format('M[/]D[/]YYYY')),
+    }, {
+        day: (moment().add(3, 'days').format('M[/]D[/]YYYY')),
+    }, {
+        day: (moment().add(4, 'days').format('M[/]D[/]YYYY')),
+    }, {
+        day: (moment().add(5, 'days').format('M[/]D[/]YYYY')),
+    }]
     //TESTS FOR DATE VARIABLES
     // var tomorrow = 0;
-    // var theNextDay = (moment().add(2, 'days').format('YYYY[-]MM[-]DD'))
+
     // console.log(theNextDay)
 
     //GLOBAL VARIABLES
     var navList = $('#recentCities')
-    var fiveDay = $('fiveDay')
+    var fiveDay = $('#fiveDay')
     var userLocation = "";
     //API VARIABLES
     var wxKey = "&appid=d4e0d5067632cdd06a4bad12b5b1e650";
     var wxApi = "https://api.openweathermap.org/data/2.5/"
-    var wxDaily = "forecast?"
+    var wxOne = "https://api.openweathermap.org/data/2.5/onecall?";
     var wxUvI = "uvi?"
     var wxCurr = "weather?"
     var imperials = "&units=imperial"
@@ -34,16 +44,6 @@ $().ready(function () {
         wxCond: "",// response.weather[0].description
         wxIcon: "", // response.weather[0].icon Gets the weather image icon class
         uvindex: "", // NEED TO FIND EXAMPLE API CALL
-        forecast: [{
-
-            //template keys needed
-            // date: "", // response.
-            // time: "", 
-            // temp: "", // response.
-            // humidity: "", // response.
-            // wxIcon: "", // response.
-            // wxCond: "",// response.
-        }]
     }
 
     //--------- BEGIN API CALLS ---------
@@ -71,13 +71,16 @@ $().ready(function () {
                     activeLocation.wind = response.wind.speed
                     activeLocation.wxCond = response.weather[0].description
                     activeLocation.wxIcon = response.weather[0].icon
+                    fiveDay.empty()
                     renderCurrWx()
-                    callDailyApi(param)
+                    // callDailyApi(param) // OLD CALL
+                    callOneApi(coords)
                 }) // end of then function
         } // end of CURRENT WX ajax call
 
-        function callDailyApi(param) {
-            queryURL = wxApi + wxDaily + param + imperials + wxKey
+
+        function callOneApi(param) {
+            queryURL = wxOne + param + imperials + wxKey
             console.log(queryURL)
             $.ajax({
                 url: queryURL,
@@ -85,19 +88,53 @@ $().ready(function () {
             })
                 .then(function (response) {
                     console.log(response)
-                    // call a function that makes an object and key value in the array for each match of 15:00 within activeLocation.forecast[i]
+                    var dailyArray = response.daily
+                    console.log(dailyArray)
+                    for (let i = 1; i < dailyArray.length - 2; i++) {
+
+                        // // console daily objects
+                        let dailyObj = dailyArray[i];
+                        console.log(dailyObj.temp.max)
+
+                        let dayCard = $('<div>').addClass('dayCard').appendTo(fiveDay)
+                        //append date insert moment iterator
+                        $('<div>').addClass('card-header').appendTo(dayCard).text(nextFive[i - 1].day)
+                        let wxDeets = $('<div>').addClass('card-body').appendTo(dayCard)
+                        //append icon
+                        $('<img>').appendTo(wxDeets).attr('src', "http://openweathermap.org/img/wn/" + dailyObj.weather[0].icon + "@2x.png").prop('alt', activeLocation.wxCond)
+                        //temp
+                        $('<p>').addClass('card-text').appendTo(wxDeets).text("Temperature: " + dailyObj.temp.max.toFixed(0) + " \xB0F")
+                        //append humidity
+                        $('<p>').addClass('card-text').appendTo(wxDeets).text("Humidity: " + dailyObj.humidity + "%")
 
 
-                    // renderFcast() to create elements
+                        // TARGET FIVE DAY CONTAINER AND CREATE ELEMENTS FOR EACH DAY OF OBJECT ARRAY {
+                        //create card
+                        // let dayCard = $('<div>').addClass('day-card').text()
+                        // dayCard.appendTo(fiveDay)
+                        // let futureDate = $('<div>').addClass('card-header').text()
+                        // futureDate.appendTo(dayCard)
+                        // let wxDeets = $('<div>').addClass('card-body').text()
+                        // wxDeets.appendTo(dayCard)
+                        // let futureIcon = $('<h5>').addClass('card-title').text()
+                        // futureIcon.appendTo(wxDeets)
+                        // let futureTemp = $('<p>').addClass('card-text').text()
+                        // futureTemp.appendTo(wxDeets)
+                        // let futureHum = $('<p>').addClass('card-text').text()
+                        // futureHum.appendTo(wxDeets)
+                    }
+
                 }) // end of then function
-        } // end of 5 DAY 4CAST ajax call
+        } // end of ONE CALL WX ajax call
+
+
 
         function callUvApi(param) {
             queryURL = wxApi + wxUvI + param + wxKey
             console.log(queryURL)
             $.ajax({
                 url: queryURL,
-                method: "GET"
+                method: "GET",
             })
                 .then(function (response) {
                     activeLocation.uvindex = response.value
@@ -192,25 +229,6 @@ $().ready(function () {
         $('#cityHum').text("Humidity: " + activeLocation.humidity + "%")
         $('#cityWs').text("Wind Speed: " + activeLocation.wind + " MPH")
     }
-    function renderFcast() {
-        // TARGET FIVE DAY CONTAINER AND CREATE ELEMENTS FOR EACH DAY OF OBJECT ARRAY
-        for (let i = 0; i < activeLocation.forecast.length; i++) {
-            let dayCard = $('<div>').addClass('day-card').text()
-            dayCard.appendTo(fiveDay)
-            let futureDate = $('<div>').addClass('card-header').text()
-            futureDate.appendTo(dayCard)
-            let wxDeets = $('<div>').addClass('card-body').text()
-            wxDeets.appendTo(dayCard)
-            let futureIcon = $('<h5>').addClass('card-title').text()
-            futureIcon.appendTo(wxDeets)
-            let futureTemp = $('<p>').addClass('card-text').text()
-            futureTemp.appendTo(wxDeets)
-            let futureHum = $('<p>').addClass('card-text').text()
-            futureHum.appendTo(wxDeets)
-        }
-
-    }
-
 
 
     // ----------- SEARCH FUNCTIONALITY / NAV ITEM ADDITION
