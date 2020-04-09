@@ -132,29 +132,32 @@ $().ready(function () {
         function callUvApi(param) {
             queryURL = wxApi + wxUvI + param + wxKey
             console.log(queryURL)
+
             $.ajax({
                 url: queryURL,
                 method: "GET",
             })
                 .then(function (response) {
                     activeLocation.uvindex = response.value
-                    let uvIndex = activeLocation.uvindex
-                    console.log(activeLocation)
+                    let uvIndex = parseInt(activeLocation.uvindex)
+                    console.log(uvIndex)
+                    // $('#cityUv').text("UV Index: " + uvIndex)
                     $('#cityUv').text("UV Index: " + uvIndex.toFixed(1))
+
                     if (uvIndex < 3) {
-                        $('#cityUv').addClass('uvIndex uvLow')
+                        $('#cityUv').removeClass().addClass('uvLow')
                     }
-                    if (uvIndex >= 3 && uvIndex < 5) {
-                        $('#cityUv').addClass('uvIndex uvMod')
+                    if (uvIndex >= 3) {
+                        $('#cityUv').removeClass().addClass('uvMod')
                     }
-                    if (uvIndex >= 5 && uvIndex < 7) {
-                        $('#cityUv').addClass('uvIndex uvHigh')
+                    if (uvIndex >= 5) {
+                        $('#cityUv').removeClass().addClass('uvHigh')
                     }
-                    if (uvIndex >= 7 && uvIndex < 10) {
-                        $('#cityUv').addClass('uvIndex uvVhigh')
+                    if (uvIndex >= 7) {
+                        $('#cityUv').removeClass().addClass('uvVhigh')
                     }
                     if (uvIndex >= 10) {
-                        $('#cityUv').addClass('uvIndex uvXtreme')
+                        $('#cityUv').removeClass().addClass('uvXtreme')
                     }
                 }) // end of then function
         } // end of UV INDEX ajax call

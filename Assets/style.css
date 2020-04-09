@@ -34,7 +34,7 @@
 }
 
 /* Styling for UV Index */
-.uvIndex {
+#cityUv {
     vertical-align: middle;
     border: 1px solid transparent;
     padding: .375rem .75rem;
